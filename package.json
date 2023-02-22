@@ -1,5 +1,5 @@
 {
-  "name": "fastify-swr",
+  "name": "@autotelic/fastify-swr",
   "version": "0.0.0",
   "description": "stale-while-revalidate caching handler for fastify",
   "main": "index.js",
@@ -28,7 +28,8 @@
     "fastify": "^4.11.0",
     "fastify-cli": "^5.7.1",
     "sinon": "^15.0.1",
-    "tap": "^16.3.4"
+    "tap": "^16.3.4",
+    "undici": "^5.20.0"
   },
   "dependencies": {
     "fastify-plugin": "^4.5.0"

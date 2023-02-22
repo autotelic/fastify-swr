@@ -1,4 +1,5 @@
 const swrPlugin = require('..')
+const { fetch } = require('undici')
 
 const boredApi = 'https://www.boredapi.com'
 
