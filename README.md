@@ -61,5 +61,5 @@ Once running, navigate to `localhost:3000` in the browser
 
   - **`cache`: `Pick<Map, 'get' | 'set' | 'delete'>`** - The cache instance for the plugin to use. Must contain `get`, `set`, and `delete` methods matching the signature of a `Map`. *Defaults to `new Map()`*.
 
-  - **`logger`: `{ debug: (log: string) => void }`** - A logger to be used for the plugin's debug logs. *Defaults to `fastify.log` (Note: the log-level must be set to 'debug' to view these)*.
+  - **`logger`: `{ debug: (log: string) => void }`** - A logger to be used for the plugin's debug logs. *Defaults to `fastify.log` (Note: the log-level must be set to 'debug' to view the plugin's logs)*.
 
