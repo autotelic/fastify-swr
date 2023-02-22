@@ -61,5 +61,6 @@ async function swrPlugin (fastify, { handler, name, ...swrOpts }) {
 }
 
 module.exports = fp(swrPlugin, {
-  name: PKG_NAME
+  name: PKG_NAME,
+  fastify: '4.x'
 })
