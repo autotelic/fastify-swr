@@ -13,7 +13,7 @@ npm i @autotelic/fastify-swr
 #### Usage
 
 ```js
-const fastifySwr = require('@autotelic/fastify-swr)
+const fastifySwr = require('@autotelic/fastify-swr')
 
 async function myClient (path, opts = {}) {
   const res = await fetch(new URL(`https://example.com/${path}`), opts)
