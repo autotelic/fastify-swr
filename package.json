@@ -1,13 +1,14 @@
 {
-  "name": "fastify-swr",
+  "name": "@autotelic/fastify-swr",
   "version": "0.0.0",
   "description": "stale-while-revalidate caching handler for fastify",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"TODO: ADD TESTS...\"",
+    "test": "tap --100 -j1 -R classic test/*.test.js",
     "lint": "eslint . --ext .js",
     "fix": "npm run lint -- --fix",
-    "validate": "npm run lint && npm run test"
+    "validate": "npm run lint && npm run test",
+    "dev": "fastify start example/index.js -w -P -l debug"
   },
   "keywords": [
     "fastify",
@@ -23,6 +24,14 @@
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^15.6.1",
-    "eslint-plugin-promise": "^6.1.1"
+    "eslint-plugin-promise": "^6.1.1",
+    "fastify": "^4.11.0",
+    "fastify-cli": "^5.7.1",
+    "sinon": "^15.0.1",
+    "tap": "^16.3.4",
+    "undici": "^5.20.0"
+  },
+  "dependencies": {
+    "fastify-plugin": "^4.5.0"
   }
 }
