@@ -107,3 +107,71 @@ test('Should return cached data when revalidation is already in progress', async
   same(dedupedCall, VALUE, 'should return cached value when revalidation is currently in progress')
   same(revalidatedCall, newValue)
 })
+
+test('Should call the appropriate methods when using custom cache client and client mapping', async ({ equal, same, teardown }) => {
+  const stubDateMs = 1684263312384
+
+  stub(Date, 'now')
+  Date.now.returns(stubDateMs)
+
+  teardown(async () => {
+    Date.now.restore()
+  })
+
+  const createCacheClient = ({ get, set, delete: del }) => ({
+    fetch: get,
+    update: set,
+    del
+  })
+
+  const getStub = stub()
+  const setStub = stub()
+  const deleteStub = stub()
+
+  const cacheClient = createCacheClient({
+    get: getStub,
+    set: setStub,
+    delete: deleteStub
+  })
+
+  const intervalMs = 1000
+
+  getStub.onFirstCall().resolves(JSON.stringify({ data: VALUE, staleAt: stubDateMs - intervalMs }))
+  getStub.onSecondCall().resolves()
+  setStub.resolves()
+  deleteStub.resolves()
+
+  const handlerStub = stub()
+
+  handlerStub.onFirstCall().returns(VALUE)
+
+  function testHandler () {
+    return handlerStub()
+  }
+
+  const app = await createApp({
+    handler: testHandler,
+    interval: intervalMs / 1000, // convert to seconds
+    cache: cacheClient,
+    cacheClientMapping: {
+      get: 'fetch',
+      set: 'update',
+      delete: 'del'
+    }
+  })
+
+  await app.testHandler(KEY)
+
+  await app.testHandler(KEY)
+
+  equal(handlerStub.callCount, 1, 'handler should be called once')
+  same(getStub.callCount, 2, 'should call the renamed get method twice')
+  same(getStub.args, [[KEY], [KEY]], 'should call the renamed get method with the expected args')
+  same(deleteStub.callCount, 1, 'should call the renamed delete method once')
+  same(deleteStub.args, [[KEY]], 'should call the renamed delete method with the expected args')
+  same(setStub.callCount, 1, 'should call the renamed set method once')
+  same(
+    setStub.args,
+    [[KEY, JSON.stringify({ data: VALUE, staleAt: stubDateMs + intervalMs })]],
+    'should call the renamed set method with the expected args')
+})
