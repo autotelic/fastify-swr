@@ -2,9 +2,16 @@ const fp = require('fastify-plugin')
 
 const PKG_NAME = 'fastify-swr'
 
+const defaultMethods = {
+  delete: 'delete',
+  get: 'get',
+  set: 'set'
+}
+
 class SWR {
-  constructor ({ cache, handler, interval, logger }) {
+  constructor ({ cache, cacheClientMapping = {}, handler, interval, logger }) {
     if (!handler) throw Error(`(${PKG_NAME}) handler is a required option`)
+    this._methods = { ...defaultMethods, ...cacheClientMapping }
     this._cache = cache ?? new Map()
     this._handler = handler
     this._interval = interval ?? 60
@@ -13,18 +20,20 @@ class SWR {
   }
 
   async getData (key, ...args) {
-    const { data: cachedData, staleAt = Infinity } = this._cache.get(key) ?? {}
+    const { get, set, delete: del } = this._methods
+    const rawData = await this._cache[get](key)
+    const { data: cachedData, staleAt = Infinity } = rawData ? JSON.parse(rawData) : {}
     if (!cachedData) {
       this._logger.debug(`(${PKG_NAME}) Cached data not found for key: ${key}`)
       const data = await this._deDupedHandler(key, ...args)
       const staleAt = Date.now() + (this._interval * 1000)
-      this._cache.set(key, { data, staleAt })
+      await this._cache[set](key, JSON.stringify({ data, staleAt }))
       return data
     }
     if (staleAt <= Date.now()) {
       this._logger.debug(`(${PKG_NAME}) Triggering update for stale key: ${key}`)
       await this._triggerRevalidate(key, ...args)
-      this._cache.delete(key)
+      await this._cache[del](key)
     }
     this._logger.debug(`(${PKG_NAME}) Returning cached data for key: ${key}`)
     return cachedData
